@@ -14,7 +14,7 @@ strict-plurality rule for the modal gentrification label.
   4. Table 3 drawn from 1-3 (nothing hard-coded): rho Cascade_Dominance,
      rho Cross_Decile_Share, Kruskal-Wallis H (epsilon^2), Cramer's V and ARI
      per frame and window, in the same style as Table 4. A dagger marks any
-     rho or H with p >= 0.05, and the caption names those cells and their p.
+     rho or H with p >= 0.05. No caption: it lives in the manuscript source.
  
 Modal rule (manuscript Section 3.4): an MSOA is modal-gentrification only when
 its GEN LSOAs strictly outnumber every other class among its constituent LSOAs;
@@ -36,13 +36,12 @@ Outputs
   outputs/manuscript_aggregate_crosstab_20261021.csv
   outputs/manuscript_aggregate_correspondence_20261021.md
   outputs/manuscript_table3_20261021.csv          rows as in Table 3
-  outputs/Table 3.png                             Table 3 with caption
+  outputs/Table 3.png                             Table 3, no caption
  
 Run from the repository root:
     python scripts/manuscript_aggregate_correspondence.py
 """
  
-import textwrap
 from pathlib import Path
  
 import matplotlib
@@ -147,14 +146,11 @@ def fmt_p(p):
 # --------------------------------------------------------------------------
 # Table numbers: change here if the order of tables changes.
 TABLE_NAME = "Table 3"
-TABLE4_NAME = "Table 4"   # the cross-tabulation behind Cramer's V and the ARI
 TABLE_PNG = OUT / f"{TABLE_NAME}.png"
 TABLE_CSV = OUT / f"manuscript_table3_{STAMP}.csv"
-SHOW_CAPTION = True       # False leaves the caption to the manuscript source
 ALPHA = 0.05
-DAGGER = "†"
+DAGGER = "†"              # p >= ALPHA; explain it in the manuscript caption
 MINUS = "−"               # typographic minus
-NB = " "             # non-breaking space, keeps "n = 982" on one line
  
  
 def table3_data(corr, kw, ct):
@@ -193,53 +189,7 @@ def table3_rows(t):
              _num(r.ari, 3)] for r in t.itertuples()]
  
  
-def _p_text(p):
-    return f"{p:.2g}"
- 
- 
-def _all_below(ps, what):
-    if (ps < 0.001).all():
-        return f"all {what} have p{NB}<{NB}0.001"
-    if (ps < ALPHA).all():
-        return f"all {what} have p{NB}<{NB}0.05"
-    return None
- 
- 
-def table3_caption(t, n_zones, n_gen):
-    flagged = []
-    for r in t.itertuples():
-        for p, what in [(r.p_dom, "ρ Cascade_Dominance"),
-                        (r.p_cds, "ρ Cross_Decile_Share"),
-                        (r.p_H, "H")]:
-            if p >= ALPHA:
-                flagged.append(f"{what}, Frame{NB}{r.frame} {r.window} "
-                               f"(p{NB}={NB}{_p_text(p)})")
-    if flagged:
-        sig = (f"{DAGGER} Not significant at the 5% level: " + "; ".join(flagged)
-               + ". All other ρ and H have p" + NB + "<" + NB + "0.05")
-    else:
-        sig = "All ρ and H have p" + NB + "<" + NB + "0.05"
-    extra = [s for s in (_all_below(t.p_cds, "ρ Cross_Decile_Share"),
-                         _all_below(t.p_H, "H")) if s and "0.001" in s]
-    sig += ("; " + " and ".join(extra) if extra else "") + "."
- 
-    return (
-        f"{TABLE_NAME}. Aggregate correspondence between flow measures, flow "
-        "regimes and neighbourhood change, by reference frame and migration window "
-        f"(n{NB}={NB}{n_zones} zones). Spearman’s ρ is calculated between each flow "
-        "measure and IMD percentile change, 2010–2019; positive values indicate "
-        "movement towards a less deprived relative position. Kruskal–Wallis H "
-        "compares IMD percentile change across the four flow regimes, with "
-        f"ε²{NB}={NB}(H{NB}−{NB}k{NB}+{NB}1)/(n{NB}−{NB}k) in brackets. "
-        f"Cramér’s V (equal to |φ| for a 2{NB}×{NB}2 table) and the adjusted Rand "
-        "index (ARI) compare “Cascade-led” membership with the modal gentrification "
-        f"label ({n_gen} zones; strict plurality of Yee and Dennett’s (2022) Class 2 "
-        "categories, ties not labelled); they are descriptive, and the underlying "
-        f"cross-tabulation is reported in {TABLE4_NAME}. " + sig
-    )
- 
- 
-def render_table3(rows, caption, path):
+def render_table3(rows, path):
     plt.rcParams["font.family"] = "STIXGeneral"
     plt.rcParams["mathtext.fontset"] = "stix"
  
@@ -247,19 +197,12 @@ def render_table3(rows, caption, path):
     X = [0.04, 0.115, 0.255, 0.415, 0.585, 0.765, 0.905]
     FS = 10.5
  
-    fig = plt.figure(figsize=(10.5, 4.0 if caption else 3.0), dpi=300)
+    fig = plt.figure(figsize=(10.5, 4.0), dpi=300)
     ax = fig.add_axes([0.02, 0.0, 0.96, 1.0])
     ax.patch.set_visible(False)
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
     ax.axis("off")
- 
-    # vertical layout in axes units, scaled so the body is the same with or
-    # without the caption
-    sy = 1.0 if caption else 4.0 / 3.0
- 
-    def Y(v):
-        return 1 - (1 - v) * sy
  
     def hline(y, x0=0.0, x1=1.0, lw=0.8, color="black"):
         ax.plot([x0, x1], [y, y], color=color, lw=lw, solid_capstyle="butt")
@@ -267,17 +210,17 @@ def render_table3(rows, caption, path):
     def txt(x, y, s, **kw):
         ax.text(x, y, s, ha="center", va="center", fontsize=FS, **kw)
  
-    hline(Y(0.965), lw=1.1)
+    hline(0.965, lw=1.1)
  
     # spanning headers: what each block of columns is compared with
-    y_grp = Y(0.925)
+    y_grp = 0.925
     txt((X[2] + X[4]) / 2, y_grp, "IMD percentile change, 2010–2019")
-    hline(Y(0.895), X[2] - 0.075, X[4] + 0.085, lw=0.6)
+    hline(0.895, X[2] - 0.075, X[4] + 0.085, lw=0.6)
     txt((X[5] + X[6]) / 2, y_grp, "Modal gentrification label")
-    hline(Y(0.895), X[5] - 0.07, X[6] + 0.06, lw=0.6)
+    hline(0.895, X[5] - 0.07, X[6] + 0.06, lw=0.6)
  
     # column headers
-    yh = Y(0.835)
+    yh = 0.835
     for x, s in [(X[0], "Frame"), (X[1], "Window"),
                  (X[2], "Spearman’s ρ\nCascade_Dominance"),
                  (X[3], "Spearman’s ρ\nCross_Decile_Share"),
@@ -285,12 +228,12 @@ def render_table3(rows, caption, path):
                  (X[5], "Cramér’s V"), (X[6], "ARI")]:
         txt(x, yh, s, linespacing=1.15)
  
-    y_mid = Y(0.77)
+    y_mid = 0.77
     hline(y_mid, lw=0.6)
  
     # body, with light rules between rows
-    row_h = 0.062 * sy
-    y = y_mid - 0.04 * sy
+    row_h = 0.062
+    y = y_mid - 0.04
     for i, r in enumerate(rows):
         for x, v in zip(X, r):
             txt(x, y, str(v))
@@ -298,12 +241,8 @@ def render_table3(rows, caption, path):
             hline(y - row_h / 2, lw=0.4, color="#bbbbbb")
         y -= row_h
  
-    y_bot = y + row_h - 0.035 * sy
+    y_bot = y + row_h - 0.035
     hline(y_bot, lw=1.1)
- 
-    if caption:
-        ax.text(0.0, y_bot - 0.03, textwrap.fill(caption, width=172),
-                ha="left", va="top", fontsize=9.2, style="italic", linespacing=1.35)
  
     # Crop to the drawn rules and text, so no empty band is left below the table.
     fig.canvas.draw()
@@ -314,11 +253,10 @@ def render_table3(rows, caption, path):
     plt.close(fig)
  
  
-def write_table3(corr, kw, ct, n_zones, n_gen):
+def write_table3(corr, kw, ct):
     t = table3_data(corr, kw, ct)
     t.to_csv(TABLE_CSV, index=False)
-    caption = table3_caption(t, n_zones, n_gen) if SHOW_CAPTION else None
-    render_table3(table3_rows(t), caption, TABLE_PNG)
+    render_table3(table3_rows(t), TABLE_PNG)
     return t
  
  
@@ -371,7 +309,7 @@ def main():
                + (", ".join(changed) if changed else "none") + ".",
                "Chi-square without continuity correction; Cramer's V = sqrt(chi2 / n)."]
  
-        write_table3(corr, kw, ct, len(d), int(gen.sum()))
+        write_table3(corr, kw, ct)
         md += ["", f"{TABLE_NAME} written to `{TABLE_PNG.relative_to(ROOT)}` "
                f"(rows in `{TABLE_CSV.relative_to(ROOT)}`)."]
     else:
