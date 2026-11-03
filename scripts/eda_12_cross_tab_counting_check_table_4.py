@@ -1,4 +1,3 @@
-
 """Manuscript Section 4.1: "Cascade-led" status x modal gentrification label.
  
 Builds the separate cross-tabulation table (TABLE_NAME below) that reports, for
@@ -34,18 +33,18 @@ Inputs
 Outputs
   outputs/manuscript_cascade_label_table_<STAMP>.csv
   outputs/manuscript_cascade_label_table_<STAMP>.md
-  outputs/<TABLE_NAME>.png
+  outputs/<TABLE_NAME>.png                     no caption: it lives in the manuscript source
  
 Run from the repository root:
     python scripts/manuscript_cascade_label_table.py
 """
  
-import textwrap
 from pathlib import Path
  
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.transforms import Bbox
 import numpy as np
 import pandas as pd
  
@@ -61,14 +60,10 @@ STAMP = "20261027"
 # Table numbers: change here if the order of tables changes.
 # This table replaces the earlier by-regime Table 4 and takes its number.
 TABLE_NAME = "Table 4"
-TABLE3_NAME = "Table 3"   # rho, H, Cramer's V, ARI
 TABLE_PNG = OUT / f"{TABLE_NAME}.png"
  
 FRAMES = ["A", "B", "C"]
 YEARS = [("11", "2011"), ("21", "2021")]
-OTHER_REGIMES = ["Counter-led", "Symmetric", "Lateral"]
- 
-NB = " "   # non-breaking space, keeps "n = 982" on one line
  
  
 # --------------------------------------------------------------------------
@@ -159,7 +154,7 @@ def compare_with_previous(t):
  
  
 # --------------------------------------------------------------------------
-# Table rows and caption
+# Table rows
 # --------------------------------------------------------------------------
 def _cell(n, pct):
     return f"{n} ({pct:.1f}%)"
@@ -181,36 +176,10 @@ def table_rows(t):
     return rows
  
  
-def table_caption(n_zones, n_gen):
-    others = ", ".join(f"“{r}”" for r in OTHER_REGIMES[:-1]) + f" and “{OTHER_REGIMES[-1]}”"
-    return (
-        f"{TABLE_NAME}. “Cascade-led” flow-regime membership and the modal "
-        "gentrification label, by reference frame and migration window "
-        f"(n{NB}={NB}{n_zones} zones). "
-        "Labelled: the zone carries the modal gentrification label, meaning that "
-        "among its constituent LSOAs, those classified as gentrification (GEN) in "
-        "the Class 2 typology of Yee and Dennett (2022) strictly outnumber those in "
-        "every other Class 2 category; a tie involving GEN is treated as not "
-        "labelled. The label is assigned once and does not vary by frame or window, "
-        f"so the same {n_gen} zones are labelled in every row; only flow-regime "
-        "membership changes. “Cascade-led” zones are those assigned to the "
-        "“Cascade-led” flow regime under the given reference frame and migration "
-        f"window; other zones are those in the {others} regimes. "
-        "Percentages in brackets are shares of the zones in that group, so within "
-        "each group the labelled and not-labelled percentages sum to 100%. "
-        "The four count cells partition all "
-        f"{n_zones} zones. The final column gives the percentage of the {n_gen} "
-        "labelled zones that lie outside the “Cascade-led” regime. "
-        "The cross-tabulation is descriptive and no significance tests are applied. "
-        f"Cramér’s V and the adjusted Rand index for each row are reported in "
-        f"{TABLE3_NAME}."
-    )
- 
- 
 # --------------------------------------------------------------------------
 # Rendering
 # --------------------------------------------------------------------------
-def render_table(rows, caption, n_gen, path):
+def render_table(rows, n_gen, path):
     plt.rcParams["font.family"] = "STIXGeneral"
     plt.rcParams["mathtext.fontset"] = "stix"
  
@@ -272,10 +241,12 @@ def render_table(rows, caption, n_gen, path):
     y_bot = y + row_h - 0.035
     hline(y_bot, lw=1.1)
  
-    ax.text(0.0, y_bot - 0.03, textwrap.fill(caption, width=172),
-            ha="left", va="top", fontsize=9.2, style="italic", linespacing=1.35)
- 
-    fig.savefig(path, dpi=300, bbox_inches="tight", pad_inches=0.08, facecolor="white")
+    # Crop to the drawn rules and text, so no empty band is left below the table.
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    content = Bbox.union([a.get_window_extent(renderer) for a in [*ax.texts, *ax.lines]])
+    content = content.transformed(fig.dpi_scale_trans.inverted()).padded(0.08)
+    fig.savefig(path, dpi=300, bbox_inches=content, facecolor="white")
     plt.close(fig)
  
  
@@ -309,7 +280,7 @@ def main():
         md.append("| " + " | ".join(row) + " |")
     md += ["", *compare_with_previous(t)]
  
-    render_table(table_rows(t), table_caption(len(d), n_gen), n_gen, TABLE_PNG)
+    render_table(table_rows(t), n_gen, TABLE_PNG)
     md += ["", f"{TABLE_NAME} written to `{TABLE_PNG.relative_to(ROOT)}`."]
  
     text = "\n".join(md) + "\n"
