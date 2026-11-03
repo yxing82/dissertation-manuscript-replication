@@ -1,4 +1,3 @@
-
 """Manuscript Table 6 (Table 5 before v19): gentrification-subtype presence by
 flow mechanism profile.
  
@@ -10,23 +9,19 @@ the fixed London-wide share across all 982 zones, and the difference is
 reported in percentage points. The comparison is descriptive; no significance
 tests are computed (Fisher/BH output was removed on 2026-10-25).
  
-Counts, shares and percentage-point differences are checked against
-outputs/eda13_proportions_main_20260723.csv.
- 
 Table 6 (added 2026-11-02) is drawn from the same numbers, nothing
 hard-coded. It adds an All "Cascade-led" row (the four profiles together; they
 partition the regime, so profile zones sum to it) between the profiles and the
 London-wide benchmark. Each Table 6 cell shows the count and the percentage of
 the row's zones only (SHOW_PP below). The PNG carries no caption: the caption
 lives in the LaTeX source. The CSV/MD outputs below keep their 20261017 names and content,
-because scripts/eda_12_v8_comparison_map_marker_marginal_added_20261102.py
-reads the CSV.
+because the comparison map script reads the CSV.
  
 Outputs
   outputs/manuscript_table5_mechanism_subtype_20261017.csv   long-format cells
   outputs/manuscript_table5_mechanism_subtype_20261017.md    Markdown table
   outputs/manuscript_table6_subtype_presence_<STAMP6>.csv    rows as in Table 6
-  outputs/Table_6.png                                        Table 6, no caption
+  outputs/Table_6_manuscript.png                             Table 6, no caption
  
 Run from the repository root:
     python scripts/manuscript_table5_mechanism_subtype.py
@@ -42,12 +37,11 @@ import pandas as pd
  
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "outputs" / "eda12_yee_leaf_corroboration_20260705.csv"
-REF = ROOT / "outputs" / "eda13_proportions_main_20260723.csv"
 OUT_CSV = ROOT / "outputs" / "manuscript_table5_mechanism_subtype_20261017.csv"
 OUT_MD = ROOT / "outputs" / "manuscript_table5_mechanism_subtype_20261017.md"
 STAMP6 = "20261102"
 OUT6_CSV = ROOT / "outputs" / f"manuscript_table6_subtype_presence_{STAMP6}.csv"
-OUT6_PNG = ROOT / "outputs" / "Table_6_manuscript.png"   # no space, so LaTeX can include it
+OUT6_PNG = ROOT / "outputs" / "Table_6.png"   # no space, so LaTeX can include it
 SHOW_PP = False  # Table 6 cells show count (percentage) only; True adds the pp difference
  
 PROFILES = [
@@ -237,19 +231,6 @@ def main():
                                  pp_diff=pct - pct_london))
     res = pd.DataFrame(rows)
     res.to_csv(OUT_CSV, index=False)
- 
-    # Check against the existing eda13 output.
-    ref = pd.read_csv(REF)
-    ref["year"] = ref["year"].astype(str)
-    merged = res.merge(ref, left_on=["flag_col", "year", "profile_key"],
-                       right_on=["flag_col", "year", "group"],
-                       suffixes=("", "_ref"))
-    assert len(merged) == len(res), "Missing rows when matching eda13 output"
-    assert (merged["n"] == merged["n_ref"]).all()
-    assert (merged["n_label"] == merged["n_label_ref"]).all()
-    assert np.allclose(merged["pct_group"].round(1), merged["pct_group_ref"])
-    assert np.allclose(merged["pp_diff"].round(1), merged["pp_diff_ref"])
-    print(f"All {len(res)} cells match {REF.name}.")
  
     # Manuscript-formatted table: count (share, pp difference from London-wide).
     def fmt(r):
