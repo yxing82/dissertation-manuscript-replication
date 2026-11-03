@@ -38,7 +38,7 @@ TAB5 = ROOT / "outputs" / "manuscript_table5_mechanism_subtype_20261017.csv"
 
 BND = next((ROOT / "data").glob("MSOA_Dec_2011_Boundaries_Generalised_Clipped_BGC_EW_V3_2022_*.zip"))
 
-
+EDA9 = ROOT / "outputs" / "eda9_mechanism_tree_20260705.csv"
 FIG_DIR = ROOT / "outputs" / "comparison_figs"
 OUT_PNG = FIG_DIR / "fig_manuscript_subtype_mechanism_map_3subtypes_20261102.png"
 OUT_PDF = OUT_PNG.with_suffix(".pdf")
@@ -70,13 +70,14 @@ def load():
     d = d.merge(typ, on="msoa11cd", how="left", validate="1:1")
     assert d[["Typ_C_11", "Typ_C_21"]].notna().all().all()
 
-    # Guards: must reproduce EDA 9 leaf counts and the EDA 12 subtype counts.
-    assert d["leaf_11"].value_counts().to_dict() == {
-        "outflow-internal": 81, "frame-sensitive": 57, "inflow-driven": 56,
-        "outflow-external": 19}
-    assert d["leaf_21"].value_counts().to_dict() == {
-        "outflow-internal": 90, "outflow-external": 78, "frame-sensitive": 14,
-        "inflow-driven": 13}
+        # Guard: leaves must match the EDA 6 tree zone by zone.
+    ref = pd.read_csv(EDA9).set_index("msoa11cd")
+    short = {"inflow-driven": "inflow-driven", "frame-sensitive inflow": "frame-sensitive",
+             "outflow: external-majority": "outflow-external",
+             "outflow: internal-majority": "outflow-internal"}
+    for yr in ("11", "21"):
+        expected = ref[f"leaf_{yr}"].map(short).reindex(d["msoa11cd"]).fillna("none").values
+        assert (d[f"leaf_{yr}"].fillna("none").values == expected).all(), f"leaf_{yr} differs from EDA 6"
     assert [int(d[c].sum()) for c in FLAGS] == [94, 39, 101]
 
     for yr in ("11", "21"):
