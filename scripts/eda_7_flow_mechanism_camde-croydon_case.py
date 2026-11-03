@@ -47,8 +47,6 @@ CASES = [
  
 OUT_NAME = 'fig_4_6_mechanism_cases_camden_croydon_v6.png'
 TITLE    = 'Selected flow decompositions: inflow-driven vs outflow-external mechanisms'
-CAPTION  = ('Camden 026 illustrates an inflow-driven, frame-robust Cascade-led profile; '
-            'Croydon 044 illustrates an outflow-external-majority profile.')
  
 # %% Colours and geometry
 C_IN = ALLUVIAL['cascade_in']
@@ -246,5 +244,5 @@ def build(title, cases, fname, caption='', figsize_per_row=3.25, dpi=180):
  
  
 if __name__ == '__main__' or 'ipykernel' in sys.modules:
-    build(TITLE, CASES, OUT_NAME, caption=CAPTION)
+    build(TITLE, CASES, OUT_NAME)
  

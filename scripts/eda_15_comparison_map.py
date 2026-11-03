@@ -1,9 +1,5 @@
 """Manuscript figure: flow mechanisms x all three gentrification subtypes.
 
-Redraw of EDA 12 v7 (fig_eda12_yee_subtype_mechanism_map_v7_20260729.png) with
-the marginal-gentrification (MargGen) marker added, so the map covers the same
-three subtypes as Table 5 (scripts/manuscript_table5_mechanism_subtype.py).
-
 Inputs (all tracked in the repository, no data/ folder needed):
   outputs/eda12_yee_leaf_corroboration_20260705.csv  mechanism leaves + subtype flags
                                                      (same source as Table 5)
@@ -12,14 +8,6 @@ Inputs (all tracked in the repository, no data/ folder needed):
   MSOA_Dec_2011_Boundaries_..._BGC_EW_V3_2022_*.zip  ONS MSOA 2011 boundaries (BGC)
   flow_yee_palette_v2.py                             colour grammar
 
-Changes vs v7:
-  * MargGen marker added (black X, white halo), legend entry with n.
-  * Where one MSOA carries more than one subtype, its markers are spread a few
-    hundred metres apart around the MSOA point so none hides another
-    (v7 drew SupGen and MainGen on the same point).
-  * Boundaries read from the ONS BGC shapefile in the repo root instead of the
-    untracked data/london_msoa_2011.geojson.
-  Fills, palette, titles, annotations and legends are otherwise as in v7.
 
 Run from the repository root:
     python scripts/manuscript_fig_subtype_mechanism_map.py
@@ -47,7 +35,10 @@ from flow_yee_palette_v2 import (FLOW_ALPHA, FLOW_DRAW_ORDER, FLOW_FILL,  # noqa
 SRC = ROOT / "outputs" / "eda12_yee_leaf_corroboration_20260705.csv"
 EDA4 = ROOT / "outputs" / "eda4_results_for_phase3_20260626.csv"
 TAB5 = ROOT / "outputs" / "manuscript_table5_mechanism_subtype_20261017.csv"
-BND = next(ROOT.glob("MSOA_Dec_2011_Boundaries_Generalised_Clipped_BGC_EW_V3_2022_*.zip"))
+
+BND = next((ROOT / "data").glob("MSOA_Dec_2011_Boundaries_Generalised_Clipped_BGC_EW_V3_2022_*.zip"))
+
+
 FIG_DIR = ROOT / "outputs" / "comparison_figs"
 OUT_PNG = FIG_DIR / "fig_manuscript_subtype_mechanism_map_3subtypes_20261102.png"
 OUT_PDF = OUT_PNG.with_suffix(".pdf")
