@@ -150,13 +150,7 @@ def main():
     inner = g[g["Ring"] == "Inner"].dissolve()
     inner.geometry = inner.buffer(25).buffer(-25)
 
-    TITLES = {"11": ("2011 Migration Window",
-                     "Yee labels describe change during 2001–2011"),
-              "21": ("2021 Migration Window",
-                     "compared with the same earlier gentrification geography")}
-    ANNOT = {"11": "MainGen concentrates in inflow-driven profiles · "
-                   "SupGen in outflow-internal profiles",
-             "21": "SupGen enrichment in outflow-internal persists"}
+    TITLES = {"11": "2011 migration window", "21": "2021 migration window"}
     HALO = [pe.withStroke(linewidth=MARKER_STYLE["halo_lw"], foreground="white")]
 
     fig, axes = plt.subplots(1, 2, figsize=(15.6, 8.3))
@@ -172,24 +166,24 @@ def main():
         ax.scatter(*pos["MargGen"], zorder=6, path_effects=HALO, **MARGEN_STYLE)
         ax.scatter(*pos["SupGen"], zorder=7, path_effects=HALO, **MARKER_STYLE["supgen"])
         ax.scatter(*pos["MainGen"], zorder=8, path_effects=HALO, **MARKER_STYLE["maingen"])
-        t, s = TITLES[yr]
-        ax.set_title(t + "\n", fontsize=12.8, fontweight="bold", pad=10)
-        ax.text(0.5, 1.035, s, transform=ax.transAxes, ha="center", fontsize=10,
-                style="italic", color="#555555")
+        ax.set_title(TITLES[yr], fontsize=12.8, fontweight="bold", pad=10)
         ax.set_axis_off()
-
-    fig.text(0.28, 0.165, ANNOT["11"], ha="center", fontsize=9.3, color="#444444")
-    fig.text(0.755, 0.165, ANNOT["21"], ha="center", fontsize=9.3, color="#444444")
 
     # fill_handles = [mpatches.Patch(fc=FLOW_FILL[c], alpha=FLOW_ALPHA[c], label=FLOW_LABEL[c])
     #                 for c in ("inflow-driven", "frame-sensitive", "outflow-external",
     #                           "outflow-internal", "counter", "other")]
         # Legend wording only: rename "Counter-led" to "Escalator-led".
     # Classification, data and the shared palette are unchanged.
-    legend_label = dict(FLOW_LABEL)
-    assert "Counter-led" in legend_label["counter"], legend_label["counter"]
-    legend_label["counter"] = legend_label["counter"].replace("Counter-led", "Escalator-led")
-
+    # Legend wording in the article's terms (classification and colours unchanged).
+    legend_label = {
+        "inflow-driven":    "Inflow-driven, frame-robust",
+        "frame-sensitive":  "Frame-sensitive inflow",
+        "outflow-external": "Outflow-external-majority",
+        "outflow-internal": "Outflow-internal-majority",
+        "counter":          "Escalator-led",
+        "other":            "Symmetric or Lateral",
+    }
+ 
     fill_handles = [mpatches.Patch(fc=FLOW_FILL[c], alpha=FLOW_ALPHA[c], label=legend_label[c])
                     for c in ("inflow-driven", "frame-sensitive", "outflow-external",
                               "outflow-internal", "counter", "other")]
@@ -224,19 +218,12 @@ def main():
         lg.get_title().set_fontweight("bold")
         lg.get_title().set_fontsize(9.2)
 
-    fig.suptitle("Correspondence between flow mechanisms and "
-                 "attribute-defined gentrification subtypes",
-                 fontsize=14, fontweight="bold", y=0.99)
-    fig.text(0.5, 0.945, "Area fills show this study’s independently derived flow "
-             "mechanisms; black markers show Yee & Dennett (2022) subtype locations.",
-             ha="center", fontsize=10.5, style="italic", color="#444444")
-
-    plt.tight_layout(rect=[0, 0.185, 1, 0.90])
+    plt.tight_layout(rect=[0, 0.16, 1, 1])
     FIG_DIR.mkdir(parents=True, exist_ok=True)
     for out in (OUT_PNG, OUT_PDF):
         fig.savefig(out, dpi=300, bbox_inches="tight", facecolor="white")
     print(f"Saved {OUT_PNG.relative_to(ROOT)} and {OUT_PDF.name}")
-
+ 
     # Marker counts per fill class, checked against Table 5 for the cascade leaves.
     t5 = pd.read_csv(TAB5)
     t5["year"] = t5["year"].astype(str)
@@ -247,8 +234,6 @@ def main():
             if r.flag_col in FLAGS:
                 assert counts.loc[r.profile_key, r.flag_col] == r.n_label
     print("\nCascade-leaf marker counts match Table 5.")
-    # print("\nSignificant cells for the caption (Table 5, p < 0.05):")
-    # print("\n".join(caption_stats()))
 
 
 if __name__ == "__main__":
