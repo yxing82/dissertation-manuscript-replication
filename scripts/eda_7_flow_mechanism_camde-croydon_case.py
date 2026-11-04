@@ -44,7 +44,7 @@ CASES = [
 ]
  
 OUT_NAME = 'mechanism_cases_camden_croydon.png'
-TITLE    = 'Selected flow decompositions: inflow-driven vs outflow-external mechanisms'
+TITLE    = ''
  
 # %% Colours and geometry
 C_IN = ALLUVIAL['cascade_in']
@@ -172,6 +172,15 @@ def panel(ax, r, yr, scale, title, dom_lon, show_headers=True):
     # arm labels + counts at the outer end of each arm
     iw_c = (L[0][0] + L[1][1])/2; ip_c = (L[2][0] + L[3][1])/2
     ow_c = (R[0][0] + R[1][1])/2; op_c = (R[2][0] + R[3][1])/2
+
+    # keep the two labels on each side apart when their arms are thin
+    def spread(y_top, y_bot, gap=0.80):
+        if y_top - y_bot < gap:
+            mid = (y_top + y_bot) / 2
+            return mid + gap / 2, mid - gap / 2
+        return y_top, y_bot
+    iw_c, ip_c = spread(iw_c, ip_c)
+    ow_c, op_c = spread(ow_c, op_c)
  
     def lab(x, y, name, tot, ext, c, ha):
         if tot / scale < 0.03:
