@@ -1,13 +1,11 @@
 """
-Figure 4.6 (two-case version): mechanism case studies for Camden 026 and Croydon 044.
+(two-case version): mechanism case studies for Camden 026 and Croydon 044.
  
 Camden 026  : inflow-driven, frame-robust Cascade-led profile (Inner London).
 Croydon 044 : outflow-external-majority profile (Outer London).
  
 Uses the same colour grammar (flow_yee_palette_v2.ALLUVIAL), input files and
 panel geometry as eda_7_v4_case_decomposition_palette_and_westminster_no_kingston.
-Can be run as a script (python fig_4_6_mechanism_cases_camden_croydon.py) or
-cell by cell in Jupyter / VS Code (the '# %%' markers split it into cells).
 """
  
 # %% Imports and paths
@@ -28,7 +26,7 @@ if str(ROOT) not in sys.path:
  
 from flow_yee_palette_v2 import ALLUVIAL
  
-OUT_DIR = ROOT / 'outputs' / 'case_study' / 'figure_4_6'
+OUT_DIR = ROOT / 'outputs' / 'case_study' 
 NAT     = ROOT / 'outputs' / 'msoa_cascade_national_frame_20260625.csv'
 EDA4    = ROOT / 'outputs' / 'eda4_results_for_phase3_20260626.csv'
 OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -45,7 +43,7 @@ CASES = [
     ('E02000237', 'Croydon 044'),   # outflow-external-majority
 ]
  
-OUT_NAME = 'fig_4_6_mechanism_cases_camden_croydon_v6.png'
+OUT_NAME = 'mechanism_cases_camden_croydon.png'
 TITLE    = 'Selected flow decompositions: inflow-driven vs outflow-external mechanisms'
  
 # %% Colours and geometry
