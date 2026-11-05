@@ -64,7 +64,14 @@ from scipy.stats import chi2_contingency, spearmanr
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from manuscript_aggregate_correspondence import strict_modal_gen  # noqa: E402
+# The Table 3 script's file name starts with a digit, so load it by path.
+import importlib.util  # noqa: E402
+_spec = importlib.util.spec_from_file_location(
+    "table3_aggregate_correspondence",
+    ROOT / "scripts" / "07_table3_aggregate_correspondence.py")
+_table3 = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_table3)
+strict_modal_gen = _table3.strict_modal_gen
 
 OUT = ROOT / "outputs"
 DATA = ROOT / "data"
