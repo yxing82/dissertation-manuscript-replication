@@ -10,7 +10,7 @@ Inputs (all tracked in the repository, no data/ folder needed):
 
 
 Run from the repository root:
-    python scripts/manuscript_fig_subtype_mechanism_map.py
+    python scripts/11_figure5_map.py
 """
 
 import sys

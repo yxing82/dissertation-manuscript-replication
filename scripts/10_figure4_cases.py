@@ -5,7 +5,7 @@ Camden 026  : inflow-driven, frame-robust Cascade-led profile (Inner London).
 Croydon 044 : outflow-external-majority profile (Outer London).
  
 Uses the same colour grammar (flow_yee_palette_v2.ALLUVIAL), input files and
-panel geometry as eda_7_v4_case_decomposition_palette_and_westminster_no_kingston.
+panel geometry as scripts/12_figureS3_further_cases.ipynb.
 """
  
 # %% Imports and paths
