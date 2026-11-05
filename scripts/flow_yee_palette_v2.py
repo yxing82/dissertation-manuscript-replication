@@ -1,5 +1,5 @@
 """
-flow_yee_palette.py — chapter-wide colour grammar (v2, 2026-07-29)
+flow_yee_palette_v2.py — chapter-wide colour grammar (v2, 2026-07-29)
 ======================================================================
 One hue family per classification system, fixed across every Results
 figure:
@@ -15,7 +15,7 @@ figure:
 
 Import from any EDA notebook (ROOT is already on sys.path):
 
-    from flow_yee_palette import FLOW_FILL, FLOW_ALPHA, YEE, DIVERGENCE
+    from flow_yee_palette_v2 import FLOW_FILL, FLOW_ALPHA, YEE, DIVERGENCE
 
 Change history vs the EDA 10/12-v3 hexes:
   counter          #6a51a3 -> COUNTER blue  (de-purpled)
