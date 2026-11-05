@@ -24,7 +24,7 @@ Outputs
   outputs/Table_6_manuscript.png                             Table 6, no caption
  
 Run from the repository root:
-    python scripts/manuscript_table5_mechanism_subtype.py
+    python scripts/09_table6_subtype_presence.py
 """
  
 from pathlib import Path

@@ -18,7 +18,7 @@ Outputs:
   outputs/diagnostics_inflow_threshold_sensitivity.md
 
 Run from the repository root:
-  python scripts/diagnostics_inflow_threshold_sensitivity.py
+  python scripts/diag_inflow_threshold.py
 """
 from pathlib import Path
 
