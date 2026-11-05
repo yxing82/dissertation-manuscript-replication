@@ -1,0 +1,12 @@
+# Developed with Python 3.11
+pandas
+numpy
+scipy
+scikit-learn
+matplotlib
+seaborn
+geopandas
+pyprojroot
+xlrd        # reads data/imd_2010.xls
+openpyxl    # reads data/nomis_2021_ts001.xlsx (optional)
+jupyter
