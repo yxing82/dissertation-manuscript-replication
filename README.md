@@ -48,7 +48,7 @@ manuscript's tables and figures from `outputs/`.
 | 07 | `07_table3_aggregate_correspondence.py` | Spearman's rho, Kruskal–Wallis, Cramér's V and ARI | `manuscript_table3_20261021.csv`, `manuscript_aggregate_*` | Table 3, §4.1 | Yee labels |
 | 08 | `08_table4_cascade_label.py` | "Cascade-led" membership against the modal gentrification label | `manuscript_cascade_label_table_20261027.*` | Table 4 | Yee labels |
 | 09 | `09_table6_subtype_presence.py` | Subtype presence by mechanism profile | `manuscript_table6_subtype_presence_20261102.csv` | Table 6, §4.3 | no |
-| 10 | `10_figure4_cases.py` | Flow decompositions of Camden 026 and Croydon 044 | `case_study/mechanism_cases_camden_croydon.png` | Figure 4 | no |
+| 10 | `10_figure4_cases.py` | Flow decompositions of Camden 026 and Croydon 044 | `case_study/mechanism_cases_camden_croydon.*` | Figure 4 | no |
 | 11 | `11_figure5_map.py` | Map of mechanism profiles and gentrification subtypes | `comparison_figs/fig_manuscript_subtype_mechanism_map_3subtypes_stacked.*` | Figure 5 | MSOA boundary zip |
 | 12 | `12_figureS3_further_cases.ipynb` | Flow decompositions of Tower Hamlets 010, Westminster 019 and Harrow 008 | `case_study/si_appendix_s2/si_further_flow_decompositions.png` | SI Figure S3 | MSOA lookup |
 

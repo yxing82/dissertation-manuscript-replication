@@ -33,6 +33,18 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)
  
 EXT_DECILE = 6        # synthetic external node sits at national D6
 YL = 3.05
+
+# ---- Print size -------------------------------------------------------------
+# 2 x 2 grid (one row per case, 2011 | 2021) drawn at the size it is printed: a
+# full portrait A4 page above the caption. FIG_W_CM is the LaTeX \textwidth
+# (A4, 2.5 cm margins) and FIG_H_CM the most the page holds with the caption
+# (footnotesize) below it. Font sizes below are therefore the sizes on the page.
+CM = 1 / 2.54
+FIG_W_CM = 16.0
+FIG_H_CM = 20.4
+COL_GAP_CM = 0.5      # gap between the 2011 and 2021 panels
+LABEL_CM = 2.0        # room for the arm labels on each side of a panel
+FS = dict(title=9, header=7, label=6.5, note=6, box=6.5, metric=6.5, legend=7.5)
  
 # Shared scale = ribbon widths comparable across both cases (Croydon will look thin
 # next to Camden). Set to False to scale each case to its own maximum flow instead.
@@ -130,7 +142,10 @@ def case_scale(cases):
     return m / 3.0
  
 # %% Panel
-def panel(ax, r, yr, scale, title, dom_lon, show_headers=True):
+def panel(ax, r, yr, scale, title, dom_lon, show_headers=True, pad=2.55, label_gap=0.80):
+    """One half-width panel. pad: room outside the rest-of-England margins for
+    the arm labels, in data units; label_gap: smallest vertical distance between
+    the two labels on one side (build() sets both from cm)."""
     a = arms_split(r, yr)
     gap = 0.30
  
@@ -140,12 +155,12 @@ def panel(ax, r, yr, scale, title, dom_lon, show_headers=True):
     ax.add_patch(mpatches.Rectangle((X_BND_R, -YL), (X_EXT_R + 0.55) - X_BND_R, 2*YL,
                                     facecolor=ZONE, edgecolor='none', zorder=0))
     for xb in (X_BND_L, X_BND_R):
-        ax.plot([xb, xb], [-YL*0.88, YL*0.80], ls=(0, (4, 3)), lw=0.9, color=BND, zorder=1)
-        ax.text(xb, -YL*0.96, 'London boundary', ha='center', va='top', fontsize=5.8, color=BND)
-    ax.text((X_EXT_L - 0.55 + X_BND_L)/2, -YL*0.80, 'rest of\nEngland', ha='center',
-            va='center', fontsize=5.8, color='#9a9a9a', style='italic')
-    ax.text((X_BND_R + X_EXT_R + 0.55)/2, -YL*0.80, 'rest of\nEngland', ha='center',
-            va='center', fontsize=5.8, color='#9a9a9a', style='italic')
+        ax.plot([xb, xb], [-YL*0.88, YL*0.80], ls=(0, (4, 3)), lw=0.7, color=BND, zorder=1)
+        ax.text(xb, -YL*0.96, 'London boundary', ha='center', va='top', fontsize=FS['note'], color=BND)
+    # "rest of England" runs up each shaded strip, which is too narrow for it across
+    for xz in ((X_EXT_L - 0.55 + X_BND_L)/2, (X_BND_R + X_EXT_R + 0.55)/2):
+        ax.text(xz, -YL*0.55, 'rest of England', ha='center', va='center', rotation=90,
+                fontsize=FS['note'], color='#9a9a9a', style='italic')
  
     # internal segments stop at the boundary, external ones cross it
     Lsegs = [(a['iw_i'], C_IN, True,  X_BND_L, X_ML),
@@ -174,7 +189,7 @@ def panel(ax, r, yr, scale, title, dom_lon, show_headers=True):
     ow_c = (R[0][0] + R[1][1])/2; op_c = (R[2][0] + R[3][1])/2
 
     # keep the two labels on each side apart when their arms are thin
-    def spread(y_top, y_bot, gap=0.80):
+    def spread(y_top, y_bot, gap=label_gap):
         if y_top - y_bot < gap:
             mid = (y_top + y_bot) / 2
             return mid + gap / 2, mid - gap / 2
@@ -185,9 +200,9 @@ def panel(ax, r, yr, scale, title, dom_lon, show_headers=True):
     def lab(x, y, name, tot, ext, c, ha):
         if tot / scale < 0.03:
             return
-        ax.text(x, y + 0.085, name, ha=ha, va='bottom', fontsize=6.4, color=c, fontweight='bold')
+        ax.text(x, y + 0.085, name, ha=ha, va='bottom', fontsize=FS['label'], color=c, fontweight='bold')
         ax.text(x, y - 0.075, f'{int(tot)}' + (f' (ext {int(ext)})' if ext > 0.5 else ''),
-                ha=ha, va='top', fontsize=6.8, color=c)
+                ha=ha, va='top', fontsize=FS['label'], color=c)
  
     lab(X_EXT_L - 0.68, iw_c, 'from wealthier', a['iw'], a['iw_e'], C_IN, 'right')
     lab(X_EXT_L - 0.68, ip_c, 'from poorer',    a['ip'], a['ip_e'], K_IN, 'right')
@@ -195,28 +210,31 @@ def panel(ax, r, yr, scale, title, dom_lon, show_headers=True):
     lab(X_EXT_R + 0.68, op_c, 'to poorer',      a['op'], a['op_e'], C_IN, 'left')
  
     if show_headers:
-        ax.text((X_EXT_L + X_ML)/2, YL*0.90, 'I N F L O W S  \u25b6',
-                ha='center', va='center', fontsize=7.6, color='#555', fontweight='bold')
-        ax.text((X_MR + X_EXT_R)/2, YL*0.90, '\u25b6  O U T F L O W S',
-                ha='center', va='center', fontsize=7.6, color='#555', fontweight='bold')
+        ax.text((X_BND_L + X_ML)/2, YL*0.90, 'Inflows  \u25b6',
+                ha='center', va='center', fontsize=FS['header'], color='#555', fontweight='bold')
+        ax.text((X_MR + X_BND_R)/2, YL*0.90, '\u25b6  Outflows',
+                ha='center', va='center', fontsize=FS['header'], color='#555', fontweight='bold')
  
     ring = 'Inner' if r['ladnm'] in INNER_LONDON else 'Outer'
-    ax.text(0.99, 0.985, f"{ring} London \u00b7 nat D{int(r['Wealth_Decile_National'])}",
-            transform=ax.transAxes, ha='right', va='top', fontsize=6.6, color='#444',
-            bbox=dict(boxstyle='round,pad=0.32', fc='white', ec='#cfcfcf', lw=0.7))
+    loc = f"{ring} London \u00b7 nat D{int(r['Wealth_Decile_National'])}"
+    box = dict(boxstyle='round,pad=0.32', fc='white', ec='#cfcfcf', lw=0.5)
+    # Title on the left and location box on the right, both above the panel
+    ax.text(0.0, 1.02, title, transform=ax.transAxes, ha='left', va='bottom',
+            fontsize=FS['title'], fontweight='bold')
+    ax.text(0.985, 1.02, loc, transform=ax.transAxes, ha='right', va='bottom',   # box border stays inside
+            fontsize=FS['box'], color='#444', bbox=box)
  
     casc, cnt = a['iw'] + a['op'], a['ip'] + a['ow']
     dom = casc / (casc + cnt)
     infl = a['iw'] / (a['iw'] + a['op']) if (a['iw'] + a['op']) else np.nan
     ext_sh = (a['iw_e'] + a['ip_e'] + a['ow_e'] + a['op_e']) / (casc + cnt) if (casc + cnt) else 0
-    ax.text(0.5, -0.045,
-            f'dominance(nat) {dom:.2f}   inflow share {infl:.2f}   '
-            f'external(cross-decile) {ext_sh:.0%}   \u00b7   dominance(London) {dom_lon:.2f}',
-            transform=ax.transAxes, ha='center', va='top', fontsize=8,
+    # two lines, so the measures fit under a half-width panel
+    measures = (f'dominance(nat) {dom:.2f}   \u00b7   dominance(London) {dom_lon:.2f}\n'
+                f'inflow share {infl:.2f}   \u00b7   external(cross-decile) {ext_sh:.0%}')
+    ax.text(0.5, -0.04, measures, transform=ax.transAxes, ha='center', va='top',
+            fontsize=FS['metric'], linespacing=1.3,
             color=C_IN if dom >= 0.5 else K_IN, fontweight='bold')
-    ax.text(0.5, 1.0, title, transform=ax.transAxes, ha='center', va='bottom',
-            fontsize=10, fontweight='bold')
-    ax.set_xlim(X_EXT_L - 2.55, X_EXT_R + 2.55)
+    ax.set_xlim(X_EXT_L - 0.55 - pad, X_EXT_R + 0.55 + pad)
     ax.set_ylim(-YL, YL)
     ax.set_axis_off()
  
@@ -228,25 +246,44 @@ LEG = [
     mpatches.Patch(color=K_EX, label='Escalator direction · crossing London boundary'),
 ]
  
-def build(title, cases, fname, caption='', figsize_per_row=3.25, dpi=180):
+def build(title, cases, fname, dpi=600):
+    """2 x 2 grid filling FIG_W_CM x FIG_H_CM: one row per case, 2011 | 2021."""
     shared = case_scale(cases)
     nr = len(cases)
-    fig, axes = plt.subplots(nr, 2, figsize=(14, figsize_per_row * nr + 1.5), squeeze=False)
+
+    # Vertical layout in cm; the panels take whatever height FIG_H_CM leaves.
+    TOP, TITLE_BAND, METRIC, ROW_GAP, LEGEND = 0.05, 0.5, 0.85, 0.3, 1.2
+    panel_h = (FIG_H_CM - TOP - (nr - 1) * ROW_GAP - LEGEND) / nr - TITLE_BAND - METRIC
+    row_h = TITLE_BAND + panel_h + METRIC
+    panel_w = (FIG_W_CM - COL_GAP_CM) / 2
+    fig = plt.figure(figsize=(FIG_W_CM * CM, FIG_H_CM * CM))
+
+    core_units = (X_EXT_R + 0.55) - (X_EXT_L - 0.55)
+    pad = LABEL_CM * core_units / (panel_w - 2 * LABEL_CM)    # LABEL_CM in data units
+    label_gap = max(0.80, 0.65 * 2 * YL / panel_h)            # two-line labels need 0.65 cm
+
     for i, (code, name) in enumerate(cases):
         sc = shared if SHARED_SCALE else case_scale([(code, name)])
-        panel(axes[i, 0], row(code), '11', sc, f'{name}  ·  2011', domA(code, '11'), show_headers=(i == 0))
-        panel(axes[i, 1], row(code), '21', sc, f'{name}  ·  2021', domA(code, '21'), show_headers=(i == 0))
- 
-    fig.suptitle(title, fontsize=13.5, fontweight='bold', y=0.995)
+        top = TOP + i * (row_h + ROW_GAP) + TITLE_BAND
+        bottom = FIG_H_CM - top - panel_h
+        for j, yr in enumerate(['11', '21']):
+            left = j * (panel_w + COL_GAP_CM)
+            ax = fig.add_axes([left / FIG_W_CM, bottom / FIG_H_CM,
+                               panel_w / FIG_W_CM, panel_h / FIG_H_CM])
+            panel(ax, row(code), yr, sc, f'{name}  \u00b7  20{yr}', domA(code, yr),
+                  show_headers=(i == 0), pad=pad, label_gap=label_gap)
+
+    if title:
+        fig.suptitle(title, fontsize=FS['title'] + 1, fontweight='bold')
     fig.legend(handles=LEG, loc='lower center', ncol=2, frameon=False,
-               fontsize=8.2, bbox_to_anchor=(0.5, 0.0))
-    if caption:
-        fig.text(0.5, 0.075, caption, ha='center', va='bottom', fontsize=8.1,
-                 style='italic', color='#333333', wrap=True)
-    plt.tight_layout(rect=[0, 0.11 if caption else 0.07, 1, 0.965])
+               fontsize=FS['legend'], columnspacing=2.0, bbox_to_anchor=(0.5, 0.0))
+
     out = OUT_DIR / fname
-    plt.savefig(out, dpi=dpi, bbox_inches='tight')
-    print(f'Saved {out}')
+    for o in (out, out.with_suffix('.pdf')):
+        # No bbox_inches='tight': keep the exact print size.
+        plt.savefig(o, dpi=dpi, facecolor='white')
+    print(f'Saved {out.name} and {out.with_suffix(".pdf").name} in {OUT_DIR} '
+          f'({FIG_W_CM:.1f} x {FIG_H_CM:.1f} cm; panels {panel_w:.1f} x {panel_h:.1f} cm)')
     plt.show()
  
  

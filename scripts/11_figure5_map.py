@@ -52,12 +52,21 @@ MARGEN_STYLE = dict(s=24, marker="X", facecolors=SUBTYPE_MARKER,
 OFFSET_M = 380  # spacing between markers that share one MSOA (metres, EPSG:27700);
                 # was 330, widened because markers are relatively larger on the 11.5 cm map
 
-# Print-size layout (cm). FIG_W_CM = A4 text width with 2.54 cm margins.
+# Print-size layout (cm). FIG_W_CM = LaTeX \textwidth (A4 with 2.5 cm margins).
+# Two maps stacked, with one legend on the right, centred on the gap between
+# them. It sits in the empty south-east corner of the 2011 map and the empty
+# north-east corner of the 2021 map (as in Yee & Dennett, 2022, Figure 6), so
+# the maps take the width a legend column would use. Map width is limited by page height: with the caption
+# (footnotesize, single-spaced) the figure can be at most about 21.3 cm tall, so
+# two maps 13.1 cm wide with a 1 cm gap (21.2 cm) fill the page.
 CM = 1 / 2.54
-FIG_W_CM = 15.9   # full figure width
-MAP_W_CM = 12.0   # width of each stacked map; the rest is the legend column
-GAP_CM = 0.3      # vertical gap between the 2011 and 2021 maps
-LEGEND_GAP_CM = 0.3   # space between the three legend blocks
+FIG_W_CM = 16.0   # full figure width = \textwidth
+MAP_W_CM = 13.1   # width of each stacked map
+MAP_X_CM = 0.8    # left edge of the maps, so maps plus legend sit centred
+LEGEND_X = 0.84   # legend starts at this fraction of the map width, where
+                  # London's outline leaves both corners empty to the right
+GAP_CM = 1.0      # vertical gap between the 2011 and 2021 maps
+LEGEND_GAP_CM = 0.25  # space between the three parts of the legend
 FONT_PT = 7       # base text size at print size
 TITLE_PT = 7      # legend block titles (bold)
 LABEL_PT = 6.5    # legend entries; keep >= 6 pt, the usual journal minimum
@@ -170,7 +179,7 @@ def main():
     inner = g[g["Ring"] == "Inner"].dissolve()
     inner.geometry = inner.buffer(25).buffer(-25)
 
-    # ---- Layout: two maps stacked, one shared legend on the right ----------
+    # ---- Layout: two maps stacked, legends in their south-east corners -----
     # Drawn at the size it is printed (A4 text width), so point sizes are real.
     xmin, ymin, xmax, ymax = outer_outline.total_bounds
     map_h_cm = MAP_W_CM * (ymax - ymin) / (xmax - xmin)
@@ -181,7 +190,8 @@ def main():
 
     for i, yr in enumerate(("11", "21")):
         bottom = fig_h_cm - (i + 1) * map_h_cm - i * GAP_CM
-        ax = fig.add_axes([0, bottom / fig_h_cm, MAP_W_CM / FIG_W_CM, map_h_cm / fig_h_cm])
+        ax = fig.add_axes([MAP_X_CM / FIG_W_CM, bottom / fig_h_cm,
+                           MAP_W_CM / FIG_W_CM, map_h_cm / fig_h_cm])
         for cls in FLOW_DRAW_ORDER:
             sub = g[g[f"map_class_{yr}"] == cls]
             if len(sub):
@@ -229,43 +239,63 @@ def main():
         Line2D([0], [0], color="#999999", lw=0.5, label="Greater London"),
     ]
 
-    # Legend column to the right of the maps, centred on the gap between them.
-    lax = fig.add_axes([(MAP_W_CM + 0.25) / FIG_W_CM, 0,
-                        (FIG_W_CM - MAP_W_CM - 0.25) / FIG_W_CM, 1])
-    lax.set_axis_off()
+    # One legend, kept together: area fills, subtype markers and boundaries,
+    # stacked and centred on the gap between the maps. It may use the empty
+    # space right of LEGEND_X: bottom of the 2011 map, the gap, top of the 2021 map.
+    def free_cm(corner):
+        """Empty height (cm) right of LEGEND_X at a map corner, 300 m clear of London."""
+        from shapely.geometry import box
+        outline = outer_outline.geometry.iloc[0].buffer(300)
+        x0 = xmin + LEGEND_X * (xmax - xmin)
+        lo, hi = 0.0, 1.0
+        for _ in range(30):
+            m = (lo + hi) / 2
+            b = (box(x0, ymin, xmax, ymin + m * (ymax - ymin)) if corner == "SE"
+                 else box(x0, ymax - m * (ymax - ymin), xmax, ymax))
+            lo, hi = (m, hi) if not b.intersects(outline) else (lo, m)
+        return lo * map_h_cm
+
+    renderer = fig.canvas.get_renderer()
+    height_cm = lambda lg: lg.get_window_extent(renderer).height / fig.dpi * 2.54
+    lx = MAP_X_CM + LEGEND_X * MAP_W_CM
     blocks = [
         (fill_handles, "Flow mechanism profile\nor flow regime (Frame C)", 1.2),
         (yee_handles, "Gentrification subtype\n(Yee & Dennett, 2022)", 1.2),
         (bnd_handles, "Boundaries", 2.0),   # longer sample so a full dash shows
     ]
-    # Stack the three legend blocks by their measured heights, then centre the
-    # column vertically on the gap between the maps.
-    renderer = fig.canvas.get_renderer()
-    to_fig = fig.transFigure.inverted()
-    lx = lax.get_position().x0
-    legends, y = [], 1.0
+    legends, y = [], fig_h_cm          # stack from the top, measuring each part
     for handles, title, hlen in blocks:
-        lg = lax.legend(handles=handles, title=title, loc="upper left",
-                        bbox_to_anchor=(lx, y), bbox_transform=fig.transFigure,
+        lg = fig.legend(handles=handles, title=title, loc="upper left",
+                        bbox_to_anchor=(lx / FIG_W_CM, y / fig_h_cm),
                         frameon=False, fontsize=LABEL_PT, title_fontsize=TITLE_PT,
                         alignment="left", borderaxespad=0, borderpad=0,
                         handlelength=hlen, handleheight=0.6, handletextpad=0.5,
                         labelspacing=0.3)
         lg.get_title().set_fontweight("bold")
-        lax.add_artist(lg)
         legends.append((lg, y))
-        y = lg.get_window_extent(renderer).transformed(to_fig).y0 - LEGEND_GAP_CM / fig_h_cm
-    used = 1.0 - (y + LEGEND_GAP_CM / fig_h_cm)
-    shift = (1.0 - used) / 2
+        y -= height_cm(lg) + LEGEND_GAP_CM
+    legend_h = fig_h_cm - y - LEGEND_GAP_CM
+
+    # Free band on the right: from the empty top of the 2021 map up to the
+    # empty bottom of the 2011 map. Centre the legend in it.
+    band_lo = map_h_cm - free_cm("NE")
+    band_hi = map_h_cm + GAP_CM + free_cm("SE")
+    assert legend_h <= band_hi - band_lo, (
+        f"legend ({legend_h:.2f} cm) taller than the free band ({band_hi - band_lo:.2f} cm)")
+    shift = fig_h_cm - (band_lo + (band_hi - band_lo + legend_h) / 2)
     for lg, y0 in legends:
-        lg.set_bbox_to_anchor((lx, y0 - shift), transform=fig.transFigure)
+        lg.set_bbox_to_anchor((lx / FIG_W_CM, (y0 - shift) / fig_h_cm), transform=fig.transFigure)
+    right = max(lg.get_window_extent(renderer).x1 for lg, _ in legends) / fig.dpi * 2.54
+    assert right <= FIG_W_CM, f"legend runs past the figure edge ({right:.2f} cm)"
+    print(f"Legend {legend_h:.1f} cm tall in a free band of {band_hi - band_lo:.1f} cm; "
+          f"content spans {MAP_X_CM:.2f}-{right:.2f} of {FIG_W_CM} cm")
 
     FIG_DIR.mkdir(parents=True, exist_ok=True)
     for out in (OUT_PNG, OUT_PDF):
         # No bbox_inches="tight": keep the exact print size so Word inserts it at 100%.
         fig.savefig(out, dpi=600, facecolor="white")
     print(f"Saved {OUT_PNG.name} and {OUT_PDF.name} "
-          f"({FIG_W_CM:.1f} x {fig_h_cm:.1f} cm; insert at 100% in Word)")
+          f"({FIG_W_CM:.1f} x {fig_h_cm:.1f} cm; include at width=\\textwidth)")
  
     # Marker counts per fill class, checked against Table 5 for the cascade leaves.
     t5 = pd.read_csv(TAB5)
