@@ -28,9 +28,9 @@ The raw inputs are not redistributed. Place them in `data/` under these names.
 | `imd_2019.csv` | English indices of deprivation 2019, with mid-2015 population | MHCLG (2019) | 01 |
 | `LSOA01_LSOA11_LAD11_EW_LU.csv` | LSOA (2001) to LSOA (2011) lookup, for the IMD 2010 recast | ONS Open Geography Portal | 01, 03 |
 | `NSPCL_NOV22_UK_LU.csv` | Postcode to OA (2011) to LSOA to MSOA lookup, November 2022 | ONS Open Geography Portal | 01, 03 |
-| `msoa_2011_to_2021_lookup.csv`, `MSOA_2011_to_2021_lookup_for_identification.csv` | MSOA (2011) to MSOA (2021) lookup | ONS Open Geography Portal | 01, 03, 06, 12 |
+| `msoa_2011_to_2021_lookup.csv`, `MSOA_2011_to_2021_lookup_for_identification.csv` | MSOA (2011) to MSOA (2021) lookup | ONS Open Geography Portal | 01, 03, 06, 12, `diag_population_rates.ipynb` |
 | `ks101ew_lsoa_2011.csv` | 2011 Census usual residents (KS101EW) by LSOA, London and all England | Nomis | 01, 03, `diag_population_rates.ipynb` |
-| `yee_LSOA_labels_forMapping.csv` | LSOA neighbourhood-change classification | Yee and Dennett (2022) | 06, 07, 08 |
+| `yee_LSOA_labels_forMapping.csv` | LSOA neighbourhood-change classification | Yee and Dennett (2022) | 06, 07, 08, `diag_population_rates.ipynb` |
 | `london_msoa_2011.geojson` | London MSOA (2011) boundaries | ONS Open Geography Portal | 02, 03, 04 |
 | `MSOA_Dec_2011_Boundaries_Generalised_Clipped_BGC_EW_V3_2022_*.zip` | MSOA (2011) boundaries | ONS Open Geography Portal | 11 |
 | `nomis_2021_ts001.xlsx` | 2021 Census usual residents (TS001) by MSOA | Nomis | `diag_volume_robustness.py`, `diag_population_rates.ipynb` |
