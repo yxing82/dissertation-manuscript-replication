@@ -59,7 +59,7 @@ Diagnostics:
 | `diag_same_decile_definition.ipynb` | Treatment of same-decile moves (strict, asymmetric and symmetric) | SI S1.2.4, Table S7 | no |
 | `diag_inflow_threshold.py` | Moving the 0.25 "cascade-inflow-share" threshold to either end of its empty interval | SI S1.3.2 | no |
 | `diag_volume_robustness.py` | Whether the results depend on migration volume rather than proportions | not reported | Yee labels; population files optional |
-| `diag_population_rates.ipynb` | Flows per 1,000 usual residents, and whether "Cascade-led" zones with the widest net cascade margin per resident more often carry the modal gentrification label | §4.1; SI S1.4, Table S11; Figure 4 caption (populations) | KS101EW and TS001 population files; MSOA lookup and Yee labels optional |
+| `diag_population_rates.ipynb` | Flows per 1,000 usual residents, and whether "Cascade-led" zones with the widest net cascade margin per resident more often carry the modal gentrification label | §4.1; SI S1.4, Table S11 | KS101EW and TS001 population files; MSOA lookup and Yee labels optional |
 
 
 Helper modules: `geo_harmonise.py` (2011–2021 MSOA harmonisation), `map_utils.py`
