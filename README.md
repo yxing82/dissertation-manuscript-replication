@@ -29,11 +29,11 @@ The raw inputs are not redistributed. Place them in `data/` under these names.
 | `LSOA01_LSOA11_LAD11_EW_LU.csv` | LSOA (2001) to LSOA (2011) lookup, for the IMD 2010 recast | ONS Open Geography Portal | 01, 03 |
 | `NSPCL_NOV22_UK_LU.csv` | Postcode to OA (2011) to LSOA to MSOA lookup, November 2022 | ONS Open Geography Portal | 01, 03 |
 | `msoa_2011_to_2021_lookup.csv`, `MSOA_2011_to_2021_lookup_for_identification.csv` | MSOA (2011) to MSOA (2021) lookup | ONS Open Geography Portal | 01, 03, 06, 12 |
-| `ks101ew_lsoa_2011.csv`, `ks101ew_lsoa_2011_allengland.csv` | 2011 Census usual residents (KS101EW) by LSOA, London and all England | Nomis | 01, 03 |
+| `ks101ew_lsoa_2011.csv` | 2011 Census usual residents (KS101EW) by LSOA, London and all England | Nomis | 01, 03, `diag_population_rates.ipynb` |
 | `yee_LSOA_labels_forMapping.csv` | LSOA neighbourhood-change classification | Yee and Dennett (2022) | 06, 07, 08 |
 | `london_msoa_2011.geojson` | London MSOA (2011) boundaries | ONS Open Geography Portal | 02, 03, 04 |
 | `MSOA_Dec_2011_Boundaries_Generalised_Clipped_BGC_EW_V3_2022_*.zip` | MSOA (2011) boundaries | ONS Open Geography Portal | 11 |
-| `ts001_msoa_2021.csv` or `nomis_2021_ts001.xlsx` | 2021 Census usual residents (TS001) by MSOA | Nomis | `diag_volume_robustness.py` only, optional |
+| `nomis_2021_ts001.xlsx` | 2021 Census usual residents (TS001) by MSOA | Nomis | `diag_volume_robustness.py`, `diag_population_rates.ipynb` |
 
 ## Run order
 
@@ -62,6 +62,8 @@ Diagnostics:
 | `diag_same_decile_definition.ipynb` | Treatment of same-decile moves (strict, asymmetric and symmetric) | SI S1.2.4, Table S7 | no |
 | `diag_inflow_threshold.py` | Moving the 0.25 "cascade-inflow-share" threshold to either end of its empty interval | SI S1.3.2 | no |
 | `diag_volume_robustness.py` | Whether the results depend on migration volume rather than proportions | not reported | Yee labels; population files optional |
+| `diag_population_rates.ipynb` | Flows per 1,000 usual residents, and whether "Cascade-led" zones with the widest net cascade margin per resident more often carry the modal gentrification label | §4.1; SI S1.4, Table S11; Figure 4 caption (populations) | KS101EW and TS001 population files; MSOA lookup and Yee labels optional |
+
 
 Helper modules: `geo_harmonise.py` (2011–2021 MSOA harmonisation), `map_utils.py`
 (choropleth maps) and `flow_yee_palette_v2.py` (figure colours).
