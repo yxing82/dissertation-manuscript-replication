@@ -1,8 +1,7 @@
 """Manuscript Section 4.1: aggregate correspondence with neighbourhood change.
  
 Single source for every statistic reported in the aggregate-correspondence
-section, following the dissertation design (Section 3.9) with the manuscript's
-strict-plurality rule for the modal gentrification label.
+section, following the strict-plurality rule for the modal gentrification label.
  
   1. Spearman rank correlations between IMD percentile change (2010-2019) and
      Cascade_Dominance / Cross_Decile_Share, Frames A, B and C, both windows.
