@@ -35,14 +35,10 @@ The raw inputs are not redistributed. Place them in `data/` under these names.
 | `MSOA_Dec_2011_Boundaries_Generalised_Clipped_BGC_EW_V3_2022_*.zip` | MSOA (2011) boundaries | ONS Open Geography Portal | 11 |
 | `ts001_msoa_2021.csv` or `nomis_2021_ts001.xlsx` | 2021 Census usual residents (TS001) by MSOA | Nomis | `diag_volume_robustness.py` only, optional |
 
-`outputs.zip` holds results aggregated to the 982 analytical zones. It does
-not contain the Output Area flows.
-
 ## Run order
 
 Steps 01–06 build the analysis files from `data/`. Steps 07–12 produce the
-manuscript's tables and figures from `outputs/`. "Needs `data/`" lists the raw
-files a step still needs once `outputs.zip` is unzipped.
+manuscript's tables and figures from `outputs/`.
 
 | Step | Script | What it does | Main files written to `outputs/` | Manuscript | Needs `data/` |
 | --- | --- | --- | --- | --- | --- |
