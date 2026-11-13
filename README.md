@@ -13,9 +13,6 @@ scripts/       analysis notebooks and scripts, numbered in run order
 data/          raw inputs (not included; see "Data")
 ```
 
-Every script reads from and writes to `data/` and `outputs/` relative to the repository
-root, so it can be run from any working directory.
-
 ## Data
 
 The raw inputs are not redistributed. Place them in `data/` under these names.
@@ -29,7 +26,7 @@ The raw inputs are not redistributed. Place them in `data/` under these names.
 | `LSOA01_LSOA11_LAD11_EW_LU.csv` | LSOA (2001) to LSOA (2011) lookup, for the IMD 2010 recast | ONS Open Geography Portal | 01, 03 |
 | `NSPCL_NOV22_UK_LU.csv` | Postcode to OA (2011) to LSOA to MSOA lookup, November 2022 | ONS Open Geography Portal | 01, 03 |
 | `msoa_2011_to_2021_lookup.csv`, `MSOA_2011_to_2021_lookup_for_identification.csv` | MSOA (2011) to MSOA (2021) lookup | ONS Open Geography Portal | 01, 03, 06, 12, `diag_population_rates.ipynb` |
-| `ks101ew_lsoa_2011.csv` | 2011 Census usual residents (KS101EW) by LSOA, London and all England | Nomis | 01, 03, `diag_population_rates.ipynb` |
+| `ks101ew_lsoa_2011.csv` | 2011 Census usual residents (KS101EW) by LSOA, England and Wales | Nomis | 01, 03, `diag_population_rates.ipynb` |
 | `yee_LSOA_labels_forMapping.csv` | LSOA neighbourhood-change classification | Yee and Dennett (2022) | 06, 07, 08, `diag_population_rates.ipynb` |
 | `london_msoa_2011.geojson` | London MSOA (2011) boundaries | ONS Open Geography Portal | 02, 03, 04 |
 | `MSOA_Dec_2011_Boundaries_Generalised_Clipped_BGC_EW_V3_2022_*.zip` | MSOA (2011) boundaries | ONS Open Geography Portal | 11 |
@@ -52,7 +49,7 @@ manuscript's tables and figures from `outputs/`.
 | 08 | `08_table4_cascade_label.py` | "Cascade-led" membership against the modal gentrification label | `manuscript_cascade_label_table_20261027.*` | Table 4 | Yee labels |
 | 09 | `09_table6_subtype_presence.py` | Subtype presence by mechanism profile | `manuscript_table6_subtype_presence_20261102.csv` | Table 6, §4.3 | no |
 | 10 | `10_figure4_cases.py` | Flow decompositions of Camden 026 and Croydon 044 | `case_study/mechanism_cases_camden_croydon.png` | Figure 4 | no |
-| 11 | `11_figure5_map.py` | Map of mechanism profiles and gentrification subtypes | `comparison_figs/fig_manuscript_subtype_mechanism_map_3subtypes_20261102.*` | Figure 5 | MSOA boundary zip |
+| 11 | `11_figure5_map.py` | Map of mechanism profiles and gentrification subtypes | `comparison_figs/fig_manuscript_subtype_mechanism_map_3subtypes_stacked.*` | Figure 5 | MSOA boundary zip |
 | 12 | `12_figureS3_further_cases.ipynb` | Flow decompositions of Tower Hamlets 010, Westminster 019 and Harrow 008 | `case_study/si_appendix_s2/si_further_flow_decompositions.png` | SI Figure S3 | MSOA lookup |
 
 Diagnostics:
