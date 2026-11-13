@@ -10,12 +10,10 @@ below refer to the manuscript and its Supporting Information (SI).
 
 ```
 scripts/       analysis notebooks and scripts, numbered in run order
-outputs.zip    every intermediate file and the files behind each table and figure
 data/          raw inputs (not included; see "Data")
 ```
 
-Unzip `outputs.zip` in the repository root to create `outputs/`. Every script
-reads from and writes to `data/` and `outputs/` relative to the repository
+Every script reads from and writes to `data/` and `outputs/` relative to the repository
 root, so it can be run from any working directory.
 
 ## Data
