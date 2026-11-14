@@ -10,7 +10,7 @@ the correspondence.
 
 Net cascade surplus = (IW + OP) - (OW + IP) for a frame. It equals
 (2 * Cascade_Dominance - 1) * Cross_Decile_Share * Total_Migration, which lets
-it be computed for Frames A, B and C from the EDA 4 regime file.
+it be computed for Frames A, B and C.
 
 Sections of the output
   1. Surplus distribution by mechanism profile (Frame C).
@@ -28,18 +28,14 @@ Sections of the output
        surplus as % of residents in Cascade-led zones, and whether
        correspondence depends on that share.
 
-Statistics follow manuscript v14 Section 3.4. Comparisons with IMD change and
-the modal label use the Section 4.1 statistics (Spearman's rho; chi-square,
+Comparisons with IMD change andthe modal label use the Section 4.1 statistics (Spearman's rho; chi-square,
 Cramér's V). Comparisons with subtype-presence indicators are descriptive, as
 in Table 5: share of zones containing the category against the fixed
 London-wide share across all 982 zones, in percentage points. No Fisher, BH or
 Mann-Whitney tests (removed 2026-10-25).
 
 Modal label: strict plurality (manuscript Section 3.4), taken from
-07_table3_aggregate_correspondence.strict_modal_gen(); 35 zones. The earlier
-version of this script (20261020 outputs) used the EDA 12 label (41 zones).
-Subtype-presence flags come from EDA 12; they involve no tie rule and are
-asserted identical to a fresh derivation in strict_modal_gen().
+07_table3_aggregate_correspondence.strict_modal_gen(); 35 zones.
 
 Inputs
   outputs/msoa_cascade_national_frame_20260625.csv   Frame C flows
